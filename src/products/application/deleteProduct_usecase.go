@@ -1,13 +1,13 @@
 package application
 
 import (
-    "demob/src/domain"
+    "demob/src/products/domain"
 )
 type DeleteProductUseCase struct {
-    repository domain.IProduct
+    repository domain.Interface_Product
 }
 
-func NewDeleteProductUseCase(repository domain.IProduct) *DeleteProductUseCase {
+func NewDeleteProductUseCase(repository domain.Interface_Product) *DeleteProductUseCase {
     return &DeleteProductUseCase{repository: repository}
 }
 

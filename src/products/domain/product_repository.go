@@ -1,6 +1,6 @@
 package domain
 
-type IProduct interface {
+type Interface_Product interface {
 	Save(product *Product) error
 	GetAll() ([]*Product, error)
 	Update(product *Product) error

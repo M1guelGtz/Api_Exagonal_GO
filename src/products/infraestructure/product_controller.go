@@ -1,11 +1,10 @@
 package infraestructure
 
 import (
-	"demob/src/application"
-	"demob/src/domain"
+	"demob/src/products/application"
+	"demob/src/products/domain"
 	"net/http"
 	"strconv"
-
 	"github.com/gin-gonic/gin"
 )
 

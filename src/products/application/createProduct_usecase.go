@@ -1,12 +1,12 @@
 package application
 
-import "demob/src/domain"
+import "demob/src/products/domain"
 
 type CreateProductUseCase struct {
-	repository domain.IProduct
+	repository domain.Interface_Product
 }
 
-func NewCreateProductUseCase(repository domain.IProduct) *CreateProductUseCase {
+func NewCreateProductUseCase(repository domain.Interface_Product) *CreateProductUseCase {
 	return &CreateProductUseCase{repository: repository}
 }
 

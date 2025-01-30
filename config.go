@@ -1,8 +1,8 @@
 package main
 
 import (
-    "demob/src/application"
-    "demob/src/infraestructure"
+    "demob/src/products/application"
+    "demob/src/products/infraestructure"
     "github.com/gin-gonic/gin"
 )
 

@@ -6,7 +6,6 @@ type Product struct {
 	Precio   float32 `gorm:"type:decimal(10,2)" json:"precio"`
 	Cantidad float32 `gorm:"type:decimal(10,2)" json:"cantidad"`
 }
-
 func NewProduct(name string, price float32, cantidad float32) *Product {
 	return &Product{Nombre: name, Precio: price, Cantidad: cantidad}
 }

@@ -1,7 +1,7 @@
 package infraestructure
 
 import (
-	"demob/src/domain"
+	"demob/src/products/domain"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
