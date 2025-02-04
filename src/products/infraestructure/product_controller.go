@@ -5,6 +5,7 @@ import (
 	"demob/src/products/domain"
 	"net/http"
 	"strconv"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,14 +14,16 @@ type ProductController struct {
 	viewAllProductsUseCase *application.ViewAllProductsUseCase
 	updateProductUseCase   *application.UpdateProductUseCase
 	deleteProductUseCase   *application.DeleteProductUseCase
+	viewById *application.ViewProdByIdUseCase
 }
 
-func NewProductController(createUseCase *application.CreateProductUseCase, viewUseCase *application.ViewAllProductsUseCase, updateUseCase *application.UpdateProductUseCase, deleteUseCase *application.DeleteProductUseCase) *ProductController {
+func NewProductController(viewById *application.ViewProdByIdUseCase, createUseCase *application.CreateProductUseCase, viewUseCase *application.ViewAllProductsUseCase, updateUseCase *application.UpdateProductUseCase, deleteUseCase *application.DeleteProductUseCase) *ProductController {
 	return &ProductController{
 		createProductUseCase:   createUseCase,
 		viewAllProductsUseCase: viewUseCase,
 		updateProductUseCase:   updateUseCase,
 		deleteProductUseCase:   deleteUseCase,
+		viewById  : viewById,
 	}
 }
 
@@ -93,4 +96,21 @@ func (pc *ProductController) DeleteProduct(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Product deleted successfully"})
+}
+func (pc *ProductController) GetProductById(c *gin.Context) {
+	idParam := c.Param("id")
+
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
+		return
+	}
+
+	product, err := pc.viewById.Execute(int32(id))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"Product": product})
 }

@@ -30,6 +30,12 @@ func (mysql *MySql) Save(product *domain.Product) error {
 	return result.Error
 }
 
+func (m *MySql) GetById(id int32) (*domain.Product, error) {
+	var product domain.Product
+	err := m.db.Where("id = ?", id).First(&product).Error
+	return &product, err
+}
+
 func (mysql *MySql) GetAll() ([]*domain.Product, error) {
 	var products []*domain.Product
 	result := mysql.db.Find(&products)
