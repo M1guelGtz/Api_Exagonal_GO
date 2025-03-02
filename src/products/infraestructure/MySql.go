@@ -1,53 +1,110 @@
 package infraestructure
 
 import (
+	"demob/src/core"
 	"demob/src/products/domain"
-
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
+	"fmt"
+	"log"
 )
 
-type MySql struct {
-	db *gorm.DB
+type MySQL struct {
+	conn *core.Conn_MySQL
 }
 
-func NewMySql(dsn string) (*MySql, error) {
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+
+func NewMySQL() (*MySQL) {
+	conn := core.GetDBPool()
+	if conn.Err != "" {
+		log.Fatalf("Error al configurar el pool de conexiones: %v", conn.Err);
+	}
+	return &MySQL{conn: conn}
+}
+
+func (mysql *MySQL) Save(product *domain.Product) error {
+	query := ``
+	result, err := mysql.conn.DB.Exec(query)
 	if err != nil {
+		log.Println("Error insertando mensaje:", err)
+		return err
+	}
+	lastID, err := result.LastInsertId()
+	if err != nil {
+		log.Println("Error obteniendo el ID del nuevo mensaje:", err)
+		return err
+	}
+	fmt.Println("✅ Nuevo Mensaje creado con ID:", lastID)
+	return nil
+}
+
+func (mysql *MySQL) GetById(id int32) (*domain.Product, error) {
+	query := fmt.Sprintf(`SELECT id, nombre, precio, cantidad FROM productos WHERE id = %d`, id)
+    row := mysql.conn.DB.QueryRow(query)
+    var product domain.Product
+    err := row.Scan(&product.Id, &product.Nombre, &product.Precio, &product.Cantidad)
+    if err != nil {
+        log.Println("Error leyendo producto:", err)
+        return nil, err
+    }
+    return &product, nil
+}
+
+func (mysql *MySQL) GetAll() ([]*domain.Product, error) {
+	query := ``
+	rows, err := mysql.conn.DB.Query(query)
+	if err != nil {
+        log.Println("Error consultando productos:", err)
+        return nil, err
+    }
+	defer rows.Close()
+	var products []*domain.Product
+	count := 0
+	for rows.Next() {
+		var product domain.Product
+		err := rows.Scan(&product.Id, &product.Nombre, &product.Precio, &product.Cantidad)
+		if err != nil {
+            log.Println("Error leyendo fila:", err)
+            continue
+        }
+		products = append(products, &product)
+		count++
+	}
+	if err := rows.Err(); err != nil {
+		log.Println("Error durante la iteración de las filas:", err)
 		return nil, err
 	}
-
-	// No realizar auto-migración automática, ya que la tabla puede estar correctamente configurada
-	// if err := db.AutoMigrate(&domain.Product{}); err != nil {
-	//     return nil, err
-	// }
-
-	return &MySql{db: db}, nil
+	log.Printf("numero de productos obtenidos: %d\n", count)
+	log.Fatalf("productos obtenidos: %+v\n", products)
+	return products, nil
 }
 
-func (mysql *MySql) Save(product *domain.Product) error {
-	result := mysql.db.Create(product)
-	return result.Error
+func (mysql *MySQL) Update(product *domain.Product) error {
+	query := "UPDATE"
+    result, err := mysql.conn.DB.Exec(query, product.Nombre, product.Precio, product.Cantidad, product.Id)
+    if err != nil {
+        log.Println("Error actualizando producto:", err)
+        return err
+    }
+    rowsAffected, err := result.RowsAffected()
+    if err != nil {
+        log.Println("Error obteniendo el número de filas afectadas:", err)
+        return err
+    }
+    log.Printf("Número de productos actualizados: %d\n", rowsAffected)
+    return nil
 }
 
-func (m *MySql) GetById(id int32) (*domain.Product, error) {
-	var product domain.Product
-	err := m.db.Where("id = ?", id).First(&product).Error
-	return &product, err
-}
-
-func (mysql *MySql) GetAll() ([]*domain.Product, error) {
-	var products []*domain.Product
-	result := mysql.db.Find(&products)
-	return products, result.Error
-}
-
-func (mysql *MySql) Update(product *domain.Product) error {
-	result := mysql.db.Save(product)
-	return result.Error
-}
-
-func (mysql *MySql) Delete(productID int32) error {
-	result := mysql.db.Delete(&domain.Product{}, productID)
-	return result.Error
+func (mysql *MySQL) Delete(productID int32) error {
+	query := "DELETE FROM"
+	result, err := mysql.conn.DB.Exec(query, productID)
+	if err != nil {
+        log.Println("Error eliminando producto:", err)
+        return err
+    }
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+        log.Println("Error obteniendo el número de filas afectadas:", err)
+        return err
+    }
+	log.Printf("Número de productos eliminados: %d\n", rowsAffected)
+	return nil
 }

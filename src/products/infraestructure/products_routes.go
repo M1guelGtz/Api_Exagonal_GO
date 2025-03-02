@@ -5,6 +5,7 @@ import (
 )
 
 func RegisterProductRoutes(r *gin.Engine, productController *ProductController) {
+	
 	products := r.Group("/products")
 	{
 		products.POST("/create", productController.CreateProduct)

@@ -17,7 +17,7 @@ type ProductController struct {
 	viewById *application.ViewProdByIdUseCase
 }
 
-func NewProductController(viewById *application.ViewProdByIdUseCase, createUseCase *application.CreateProductUseCase, viewUseCase *application.ViewAllProductsUseCase, updateUseCase *application.UpdateProductUseCase, deleteUseCase *application.DeleteProductUseCase) *ProductController {
+func NewProductController(createUseCase *application.CreateProductUseCase, viewUseCase *application.ViewAllProductsUseCase, updateUseCase *application.UpdateProductUseCase, deleteUseCase *application.DeleteProductUseCase, viewById *application.ViewProdByIdUseCase,) *ProductController {
 	return &ProductController{
 		createProductUseCase:   createUseCase,
 		viewAllProductsUseCase: viewUseCase,
