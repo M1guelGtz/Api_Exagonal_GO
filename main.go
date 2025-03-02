@@ -2,8 +2,10 @@ package main
 
 import (
 	//"os"
+
 	"demob/src/products/infraestructure"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,8 +21,15 @@ func main() {
 
 	//productController := infraestructure.NewProductController(createProductUseCase, viewAllProductsUseCase, updateProductuseCase, deleteProductUseCase, viewProductById)
 	r := gin.Default()
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173"}, // Permitir todos los orígenes (cambiar en producción)
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+	}))
 	infraestructure.Init(r)
-	if err := r.Run(":"+"3000"); err != nil {
+	if err := r.Run(":" + "3000"); err != nil {
 		panic(err)
 	}
 

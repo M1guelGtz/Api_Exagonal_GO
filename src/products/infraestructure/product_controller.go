@@ -2,115 +2,49 @@ package infraestructure
 
 import (
 	"demob/src/products/application"
-	"demob/src/products/domain"
-	"net/http"
-	"strconv"
+	"demob/src/products/infraestructure/handlers"
 
 	"github.com/gin-gonic/gin"
 )
 
 type ProductController struct {
-	createProductUseCase   *application.CreateProductUseCase
-	viewAllProductsUseCase *application.ViewAllProductsUseCase
-	updateProductUseCase   *application.UpdateProductUseCase
-	deleteProductUseCase   *application.DeleteProductUseCase
-	viewById *application.ViewProdByIdUseCase
+	createProductUseCase   *handlers.CreateProductHandler
+	viewAllProductsUseCase *handlers.GetAllProductsHandler
+	updateProductUseCase   *handlers.UpdateProductHandler
+	deleteProductUseCase   *handlers.DeleteProductHandler
+	viewById               *handlers.GetProductByIdHandler
 }
 
-func NewProductController(createUseCase *application.CreateProductUseCase, viewUseCase *application.ViewAllProductsUseCase, updateUseCase *application.UpdateProductUseCase, deleteUseCase *application.DeleteProductUseCase, viewById *application.ViewProdByIdUseCase,) *ProductController {
+func NewProductController(createUseCase *application.CreateProductUseCase, viewUseCase *application.ViewAllProductsUseCase, updateUseCase *application.UpdateProductUseCase, deleteUseCase *application.DeleteProductUseCase, viewById *application.ViewProdByIdUseCase) *ProductController {
+	createHandler := handlers.NewCreateProductHandler(createUseCase)
+	viewHandler := handlers.NewGetAllProductsHandler(viewUseCase)
+	updateHandler := handlers.NewUpdateProductHandler(updateUseCase)
+	deleteHandler := handlers.NewDeleteProductHandler(deleteUseCase)
+	viewByIdHandler := handlers.NewGetProductByIdHandler(viewById)
 	return &ProductController{
-		createProductUseCase:   createUseCase,
-		viewAllProductsUseCase: viewUseCase,
-		updateProductUseCase:   updateUseCase,
-		deleteProductUseCase:   deleteUseCase,
-		viewById  : viewById,
+		createProductUseCase:   createHandler,
+		viewAllProductsUseCase: viewHandler,
+		updateProductUseCase:   updateHandler,
+		deleteProductUseCase:   deleteHandler,
+		viewById:               viewByIdHandler,
 	}
 }
 
 func (pc *ProductController) CreateProduct(c *gin.Context) {
-	var product domain.Product
-	if err := c.ShouldBindJSON(&product); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	if err := pc.createProductUseCase.Run(product.Nombre, product.Precio, product.Cantidad); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"status":  http.StatusOK,
-		"message": "Producto creado correctamente",
-		"product": gin.H{
-			"nombre":   &product.Nombre,
-			"cantidad": &product.Cantidad,
-			"precio":   &product.Precio,
-		},
-	})
+	pc.createProductUseCase.Handle(c)
 }
 
 func (pc *ProductController) GetAllProducts(c *gin.Context) {
-	products, err := pc.viewAllProductsUseCase.Run()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{
-		"products": products,
-	})
+	pc.viewAllProductsUseCase.Handle(c)
 }
 
 func (pc *ProductController) UpdateProduct(c *gin.Context) {
-	idParam := c.Param("id")
-	id, err := strconv.ParseInt(idParam, 10, 32)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
-		return
-	}
-
-	var product domain.Product
-	if err := c.ShouldBindJSON(&product); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	product.Id = int32(id)
-
-	if err := pc.updateProductUseCase.Run(&product); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "Product updated successfully"})
+	pc.updateProductUseCase.Handle(c)
 }
 
 func (pc *ProductController) DeleteProduct(c *gin.Context) {
-	idParam := c.Param("id")
-	id, err := strconv.ParseInt(idParam, 10, 32)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
-		return
-	}
-
-	if err := pc.deleteProductUseCase.Run(int32(id)); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "Product deleted successfully"})
+	pc.deleteProductUseCase.Handle(c)
 }
 func (pc *ProductController) GetProductById(c *gin.Context) {
-	idParam := c.Param("id")
-
-	id, err := strconv.Atoi(idParam)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
-		return
-	}
-
-	product, err := pc.viewById.Execute(int32(id))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"Product": product})
+	pc.viewById.Handle(c)
 }
