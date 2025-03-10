@@ -1,9 +1,9 @@
-package infraestructure
+package infrastructure
 
 import (
 	"demob/src/products/application"
-	"demob/src/products/infraestructure/broker"
-	"demob/src/products/infraestructure/handlers"
+	"demob/src/products/infrastructure/broker"
+	"demob/src/products/infrastructure/handlers"
 
 	"github.com/gin-gonic/gin"
 )

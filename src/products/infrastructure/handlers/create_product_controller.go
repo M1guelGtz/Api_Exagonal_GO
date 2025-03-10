@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"demob/src/products/application"
 	"demob/src/products/domain"
-	"demob/src/products/infraestructure/broker"
+	"demob/src/products/infrastructure/broker"
 
 	"github.com/gin-gonic/gin"
 )

@@ -1,4 +1,4 @@
-package infraestructure
+package infrastructure
 
 import (
 	"demob/src/core"

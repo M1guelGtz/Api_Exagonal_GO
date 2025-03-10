@@ -1,8 +1,8 @@
-package infraestructure
+package infrastructure
 
 import (
 	"demob/src/products/application"
-	"demob/src/products/infraestructure/broker"
+	"demob/src/products/infrastructure/broker"
 	"fmt"
 	"log"
 	"os"

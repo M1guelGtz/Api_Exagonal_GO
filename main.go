@@ -3,7 +3,7 @@ package main
 import (
 	//"os"
 
-	"demob/src/products/infraestructure"
+	"demob/src/products/infrastructure"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -28,7 +28,7 @@ func main() {
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
-	infraestructure.Init(r)
+	infrastructure.Init(r)
 	if err := r.Run(":" + "3000"); err != nil {
 		panic(err)
 	}
